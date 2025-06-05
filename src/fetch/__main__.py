@@ -15,6 +15,16 @@ def _parse_args():
         prog="Teller Fetch",
         description="Uses Teller API to fetch bank transactions"
     )
+    parser.add_argument(
+        '--date-from',
+        type=str,
+        help="oldest record date in form yyyy-mm-dd",
+    ),
+    parser.add_argument(
+        '--date-to',
+        type=str,
+        help="newest record date in form yyyy-mm-dd",
+    ),
     parser.add_argument('--cert', type=str,
             help='path to the TLS certificate')
     parser.add_argument('--cert-key', type=str,
@@ -95,23 +105,38 @@ def main():
 
     accounts_json = response.json()
     for value in accounts_json:
+
         out_file_name = f"{value["name"]}_transactions.json"
         transactions_href = value["links"]["transactions"]
+
+        # get transactions
         response = requests.get(
             url=transactions_href,
             cert=cert,
-            auth=(access_key, '')
+            auth=(access_key, ''),
         )
         transactions_json = response.json()
+
+        # discard outside of date range
+        pruned_transactions = []
+        for transaction in transactions_json:
+            date = transaction["date"]
+            if args.date_from:
+                if date < args.date_from:
+                    continue
+            if args.date_to:
+                if date > args.date_to:
+                    continue
+            pruned_transactions.append(transaction)
+
+        # dump pruned transactions to file
         with open(
             os.path.join(output_folder, out_file_name),
             "w",
         ) as file:
-            json.dump(transactions_json, file, indent=2)
+            json.dump(pruned_transactions, file, indent=2)
 
 
 if __name__ == "__main__":
     main()
 
-    # TODO: delete this
-    # keyring.delete_password("teller-fetch", "user")
