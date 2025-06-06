@@ -9,11 +9,12 @@ import os
 import sys
 import logging
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from multiprocessing import Process, Event
 from requests.models import HTTPError
 
 logger = logging.getLogger(__name__)
+
 
 def _parse_args():
     parser = argparse.ArgumentParser(
@@ -23,6 +24,14 @@ def _parse_args():
             "Basic usage: specify the output folder and the path to each of"
             " your Teller credentials using --cert and --cert-key flags."
         ),
+    )
+    parser.add_argument(
+        'app_id',
+        help='Teller app id',
+    )
+    parser.add_argument(
+        'output_folder',
+        help='path to desired output folder',
     )
     parser.add_argument(
         '--date-from',
@@ -51,13 +60,14 @@ def _parse_args():
         help='discard saved credentials and setup from scratch',
     )
     parser.add_argument(
+        '-e',
+        '--env',
+        choices=["sandbox", "development", "production"],
+    )
+    parser.add_argument(
         '--file-type',
         choices=["json", "csv"],
         help="output file type"
-    )
-    parser.add_argument(
-        'output_folder',
-        help='path to desired output folder',
     )
     parser.add_argument(
         '-d',
@@ -77,47 +87,58 @@ def _parse_args():
 
 
 class MicroServer:
-    def __init__(self):
+    def __init__(self, app_id, environment):
+        self._app_id = app_id
+        self._environment = environment
         base_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../../")
         )
         templates_dir = os.path.join(base_dir, "templates")
         static_dir = os.path.join(base_dir, "static")
-        self.app = Flask(
+        self._app = Flask(
             __name__,
             template_folder=templates_dir,
             static_folder=static_dir,
         )
-        self.token_received_event = Event()
+        self._token_received_event = Event()
         self._register_routes()
 
     def connect_account(self):
-        flask_process = Process(target=self.app.run)
+        flask_process = Process(target=self._app.run)
         flask_process.start()
         webbrowser.open("http://127.0.0.1:5000")
-        self.token_received_event.wait()
+        self._token_received_event.wait()
         time.sleep(.5)
         flask_process.terminate()
         flask_process.join()
 
     def _register_routes(self):
 
-        @self.app.route("/", methods=["GET"])
+        @self._app.route("/", methods=["GET"])
         def home():
             return render_template("index.html")
 
-
-        @self.app.route("/complete", methods=["POST"])
+        @self._app.route("/complete", methods=["POST"])
         def complete():
             access_token = request.get_json().get("access_token", None)
             if access_token:
                 keyring.set_password("teller-fetch", "user", access_token)
-                self.token_received_event.set()
+                self._token_received_event.set()
                 logger.info("Access token received successfully from web UI")
                 return "Access token received. You may now close this window."
             else:
                 return "No access token received.", 400
 
+        @self._app.route("/app", methods=["GET"])
+        def get_app_info():
+            logger.debug("App data requested from webserver")
+            data = {
+                "app_id": self._app_id,
+                "environment": self._environment,
+            }
+            return jsonify(data)
+
+        _ = get_app_info, complete, home
 
 class Client:
     def __init__(self, cert, cert_key, access_key):
@@ -132,7 +153,6 @@ class Client:
             for account in accounts_json
         ]
         return accounts_list
-
 
     def get(self, url):
         response = requests.get(
@@ -196,12 +216,16 @@ def main():
     )
 
     access_key = keyring.get_password("teller-fetch", "user")
+    microserver = MicroServer(
+        app_id=args.app_id,
+        environment=args.env if args.env else "sandbox",
+    )
     if (not access_key):
         logger.debug("no access_key found, requesting new one")
-        microserver = MicroServer()
         microserver.connect_account()
     elif access_key and args.reset:
         keyring.delete_password("teller-fetch", "user")
+        microserver.connect_account()
         logger.debug("access_key deleted")
 
     access_key = keyring.get_password("teller-fetch", "user")
