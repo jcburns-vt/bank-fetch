@@ -1,5 +1,6 @@
 
 import json
+import csv
 import keyring
 import argparse
 import requests
@@ -12,6 +13,7 @@ import logging
 from flask import Flask, render_template, request, jsonify
 from multiprocessing import Process, Event
 from requests.models import HTTPError
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +65,7 @@ def _parse_args():
         '-e',
         '--env',
         choices=["sandbox", "development", "production"],
+        default="sandbox"
     )
     parser.add_argument(
         '--file-type',
@@ -82,6 +85,32 @@ def _parse_args():
             f"Must specify the location of Teller CERT and CERT_KEY."
             f"\n\tUse flags --cert and --cert-key respectively."
         )
+
+    if not os.path.isfile(args.cert):
+        parser.error(
+            f"Invalid certificate path: {args.cert}"
+        )
+
+    if not os.path.isfile(args.cert_key):
+        parser.error(
+            f"Invalid private key path: {args.cert_key}"
+        )
+
+    if args.date_from:
+        try:
+            datetime.strptime(args.date_from, "%Y-%m-%d")
+        except ValueError:
+            parser.error(
+                f"Invalid DATE_FROM value: {args.date_from}"
+            )
+
+    if args.date_to:
+        try:
+            datetime.strptime(args.date_to, "%Y-%m-%d")
+        except ValueError:
+            parser.error(
+                f"Invalid DATE_TO value: {args.date_to}"
+            )
 
     return args
 
@@ -188,6 +217,14 @@ class Account:
             if date_to:
                 if date > date_to:
                     continue
+
+            # discard unwanted fields
+            transaction["processing_status"] = (
+                    transaction["details"]["processing_status"]
+            )
+            transaction.pop("links", None)
+            transaction.pop("details", None)
+            transaction.pop("account_id", None)
             pruned_transactions.append(transaction)
 
         return pruned_transactions
@@ -203,8 +240,14 @@ def dump_transactions_json(out_file_path, transactions):
 
 
 def dump_transactions_csv(out_file_path, transactions):
-    # TODO: format and dump to csv
     logger.debug("dumping transactions to csv file")
+    with open(
+        f"{out_file_path}.csv",
+        "w",
+    ) as file:
+        writer = csv.DictWriter(file, fieldnames=transactions[0].keys())
+        writer.writeheader()
+        writer.writerows(transactions)
 
 
 def main():
@@ -212,6 +255,8 @@ def main():
     args = _parse_args()
     cert = (args.cert, args.cert_key)
     out_folder = args.output_folder
+    if not (os.path.isdir(out_folder)):
+        os.makedirs(out_folder, exist_ok=True)
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
