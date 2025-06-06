@@ -25,3 +25,8 @@ recent:
 		--date-from 2025-06-01 \
 		--debug
 
+basic:
+	export PYTHONPATH=src; \
+	python -m fetch app_peevqq8j16t30s9eig000 ./data \
+		--cert /etc/teller/certificate.pem \
+		--cert-key /etc/teller/private_key.pem

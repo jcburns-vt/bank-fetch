@@ -194,6 +194,7 @@ class Account:
 
 
 def dump_transactions_json(output_folder, out_file_name, transactions):
+    logger.debug("dumping transactions to json file")
     with open(
         os.path.join(output_folder, out_file_name),
         "w",
@@ -202,7 +203,8 @@ def dump_transactions_json(output_folder, out_file_name, transactions):
 
 
 def dump_transactions_csv(output_folder, out_file_name, transactions):
-    pass
+    # TODO: format and dump to csv
+    logger.debug("dumping transactions to csv file")
 
 
 def main():
@@ -247,10 +249,8 @@ def main():
 
         if not args.file_type or args.file_type=="json":
             dump_transactions_json(output_folder, out_file_name, transactions)
-            logger.info("dumping transactions to json file")
         elif args.file_type=="csv":
-            logger.info("dumping transactions to csv file")
-
+            dump_transactions_csv(output_folder, out_file_name, transactions)
 
 if __name__ == "__main__":
     main()
