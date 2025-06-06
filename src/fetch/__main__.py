@@ -193,16 +193,16 @@ class Account:
         return pruned_transactions
 
 
-def dump_transactions_json(output_folder, out_file_name, transactions):
+def dump_transactions_json(out_file_path, transactions):
     logger.debug("dumping transactions to json file")
     with open(
-        os.path.join(output_folder, out_file_name),
+        f"{out_file_path}.json",
         "w",
     ) as file:
         json.dump(transactions, file, indent=2)
 
 
-def dump_transactions_csv(output_folder, out_file_name, transactions):
+def dump_transactions_csv(out_file_path, transactions):
     # TODO: format and dump to csv
     logger.debug("dumping transactions to csv file")
 
@@ -211,7 +211,7 @@ def main():
 
     args = _parse_args()
     cert = (args.cert, args.cert_key)
-    output_folder = args.output_folder
+    out_folder = args.output_folder
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
@@ -240,7 +240,8 @@ def main():
     accounts_list = client.get_accounts()
 
     for account in accounts_list:
-        out_file_name = f"{account.name}_transactions.json"
+        out_file_name = f"{account.name}_transactions"
+        out_file_path = os.path.join(out_folder, out_file_name)
 
         transactions = account.get_transactions(
             date_from=args.date_from if args.date_from else None,
@@ -248,9 +249,9 @@ def main():
         )
 
         if not args.file_type or args.file_type=="json":
-            dump_transactions_json(output_folder, out_file_name, transactions)
+            dump_transactions_json(out_file_path, transactions)
         elif args.file_type=="csv":
-            dump_transactions_csv(output_folder, out_file_name, transactions)
+            dump_transactions_csv(out_file_path, transactions)
 
 if __name__ == "__main__":
     main()
