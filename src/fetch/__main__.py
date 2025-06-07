@@ -158,6 +158,7 @@ class MicroServer:
             }
             return jsonify(data)
 
+        # appease the LSP gods
         _ = get_app_info, complete, home
 
 class Client:
