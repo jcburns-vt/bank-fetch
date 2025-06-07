@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Connect Your Bank</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <h1>Click to connect bank accounts</h1>
-    <button id="teller-connect">Connect</button>
+  <body class="d-flex flex-column justify-content-center align-items-center vh-100">
 
-    <script src="https://cdn.teller.io/connect/connect.js"></script>
+    <h1 class="mb-4 text-center">Click to connect bank accounts</h1>
+    <button id="teller-connect" type="button" class="btn btn-primary btn-lg">Connect</button>
+
     <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="https://cdn.teller.io/connect/connect.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
