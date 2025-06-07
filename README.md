@@ -12,6 +12,18 @@ In order to use this command, you must create an account with Teller, and
 create an application. You will need your application-id, as well as the
 certificate.pem and private_key.pem that Teller provides for your app.
 
+You must also have python and pipx installed for these instructions.
+
+## Installation
+
+Navigate to the root directory of this repository and run the following:
+
+``` console
+$ pipx install .
+$ pipx ensurepath
+```
+Then restart the shell for the command to become available
+
 ## Basic Usage
 
 The most simplistic use case is shown below. The command shown takes your
@@ -20,7 +32,7 @@ that you would like to dump your bank transactions info to. Default file
 format is json, you can specify csv with `--file-type csv`.
 
 ``` console
-bank-fetch APPLICATION_ID OUTPUT_FOLDER --cert PATH_TO_CERTIFICATE \
+$ bf APPLICATION_ID OUTPUT_FOLDER --cert PATH_TO_CERTIFICATE \
     --cert-key PATH_TO_PRIVATE_KEY
 ```
 

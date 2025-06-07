@@ -119,16 +119,7 @@ class MicroServer:
     def __init__(self, app_id, environment):
         self._app_id = app_id
         self._environment = environment
-        base_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../../")
-        )
-        templates_dir = os.path.join(base_dir, "templates")
-        static_dir = os.path.join(base_dir, "static")
-        self._app = Flask(
-            __name__,
-            template_folder=templates_dir,
-            static_folder=static_dir,
-        )
+        self._app = Flask(__name__)
         self._token_received_event = Event()
         self._register_routes()
 
