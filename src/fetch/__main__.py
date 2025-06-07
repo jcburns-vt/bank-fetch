@@ -253,7 +253,7 @@ def main():
         level=logging.DEBUG if args.debug else logging.INFO,
     )
 
-    access_key = keyring.get_password("teller-fetch", "user")
+    access_key = keyring.get_password("bank-fetch", "default")
     microserver = MicroServer(
         app_id=args.app_id,
         environment=args.env if args.env else "sandbox",
@@ -262,11 +262,11 @@ def main():
         logger.debug("no access_key found, requesting new one")
         microserver.connect_account()
     elif access_key and args.reset:
-        keyring.delete_password("teller-fetch", "user")
+        keyring.delete_password("bank-fetch", "default")
         microserver.connect_account()
         logger.debug("access_key deleted")
 
-    access_key = keyring.get_password("teller-fetch", "user")
+    access_key = keyring.get_password("bank-fetch", "default")
     if not access_key:
         logger.error("error acquiring access_key")
         sys.exit(2)

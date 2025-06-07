@@ -12,7 +12,7 @@ In order to use this command, you must create an account with Teller, and
 create an application. You will need your application-id, as well as the
 certificate.pem and private_key.pem that Teller provides for your app.
 
-You must also have python and pipx installed for these instructions.
+You must also have python and pipx installed to follow these instructions.
 
 ## Installation
 
@@ -31,15 +31,23 @@ application-id, paths to certificate.pem and private_key.pem, and the folder
 that you would like to dump your bank transactions info to. Default file
 format is json, you can specify csv with `--file-type csv`.
 
+The default Teller environment is set to sandbox, this allows you to download
+mock-up transactions and accounts to validate the app is working without
+needing to enter your bank info and expend a connection. The username and
+password for sandbox mode is "username" and "password" respectively.
+
 ``` console
 $ bf APPLICATION_ID OUTPUT_FOLDER --cert PATH_TO_CERTIFICATE \
     --cert-key PATH_TO_PRIVATE_KEY
 ```
-
 The first time this command is called, a browser window will be opened that
 will prompt you to connect your bank account via the secure TellerConnect
 widget. Subsequent calls will not require you to enter your info, so if you
 want to change the associated bank, use the `--reset' flag.
+
+Be aware, when using the reset flag in any environment other than sandbox,
+your Teller access key is deleted from your system keyring and you will expend
+a Teller enrollment connection by requesting a new access key. 
 
 Once bank data is downloaded to your device, it is your own responsibility to
 ensure that it stays secured. This application is read-only and does not
