@@ -9,6 +9,7 @@ import webbrowser
 import os
 import sys
 import logging
+import copy
 
 from flask import Flask, render_template, request, jsonify
 from multiprocessing import Process, Event
@@ -142,7 +143,7 @@ class MicroServer:
         def complete():
             access_token = request.get_json().get("access_token", None)
             if access_token:
-                keyring.set_password("teller-fetch", "user", access_token)
+                keyring.set_password("bank-fetch", "default", access_token)
                 self._token_received_event.set()
                 logger.info("Access token received successfully from web UI")
                 return "Access token received. You may now close this window."
@@ -201,7 +202,8 @@ class Account:
 
         # discard outside of date range
         pruned_transactions = []
-        for transaction in self._transactions:
+        transactions = copy.deepcopy(self._transactions)
+        for transaction in transactions:
             date = transaction["date"]
             if date_from:
                 if date < date_from:
@@ -223,7 +225,6 @@ class Account:
 
 
 def dump_transactions_json(out_file_path, transactions):
-    logger.debug("dumping transactions to json file")
     with open(
         f"{out_file_path}.json",
         "w",
@@ -232,7 +233,6 @@ def dump_transactions_json(out_file_path, transactions):
 
 
 def dump_transactions_csv(out_file_path, transactions):
-    logger.debug("dumping transactions to csv file")
     with open(
         f"{out_file_path}.csv",
         "w",
@@ -286,8 +286,10 @@ def main():
         )
 
         if not args.file_type or args.file_type=="json":
+            logger.info(f"dumping {account.name} transactions to json file")
             dump_transactions_json(out_file_path, transactions)
         elif args.file_type=="csv":
+            logger.info(f"dumping {account.name} transactions to csv file")
             dump_transactions_csv(out_file_path, transactions)
 
 if __name__ == "__main__":

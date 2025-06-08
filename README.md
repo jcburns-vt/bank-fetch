@@ -1,8 +1,8 @@
 
 # Bank Fetch
 
-This terminal application is intended to make it simple to download your own
-bank transactions in json or csv format to make use of them in a budget app or
+This terminal application is intended to make it simple to download bank
+transactions in json or csv format to make use of them in a budget app or
 excel sheet. You could call the bank-fetch command from a VBA macro in order to
 automate the updating of your bank data.
 
@@ -31,19 +31,26 @@ application-id, paths to certificate.pem and private_key.pem, and the folder
 that you would like to dump your bank transactions info to. Default file
 format is json, you can specify csv with `--file-type csv`.
 
-The default Teller environment is set to sandbox, this allows you to download
-mock-up transactions and accounts to validate the app is working without
-needing to enter your bank info and expend a connection. The username and
-password for sandbox mode is "username" and "password" respectively.
-
 ``` console
 $ bf APPLICATION_ID OUTPUT_FOLDER --cert PATH_TO_CERTIFICATE \
     --cert-key PATH_TO_PRIVATE_KEY
 ```
+The default Teller environment is set to sandbox, this allows you to download
+mock-up transactions and accounts to validate the app is working without
+needing to enter your bank info and expend a connection. The username and
+password for sandbox mode is "username" and "password" respectively. Use the
+`--env` flag to set the environment to "production" when you are ready to
+attach a real bank account.
+
 The first time this command is called, a browser window will be opened that
 will prompt you to connect your bank account via the secure TellerConnect
 widget. Subsequent calls will not require you to enter your info, so if you
 want to change the associated bank, use the `--reset' flag.
+
+Use `--help` flag to view all available parameters:
+```
+$ bf -h
+```
 
 Be aware, when using the reset flag in any environment other than sandbox,
 your Teller access key is deleted from your system keyring and you will expend
