@@ -1,0 +1,19 @@
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+def add_parser(subparsers, parents):
+    # parser for the disable command
+    disable_cmd = subparsers.add_parser(
+        'disable',
+        help=(
+            "disable an existing bank connection without deleting "
+            "an enrollment"
+        ),
+        parents=parents,
+    )
+    disable_cmd.set_defaults(func=run)
+
+def run(args):
+    logger.debug("disable")
