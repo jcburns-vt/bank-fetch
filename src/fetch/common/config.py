@@ -4,14 +4,20 @@ import json
 from platformdirs import user_config_dir
 from pathlib import Path
 
+from . import keys
+
 logger = logging.getLogger(__name__)
+
 
 APP_NAME = "bank-fetch"
 CONFIG_FILE_NAME = "config.json"
 CONFIG_DIR = Path(user_config_dir(APP_NAME))
 CONFIG_FILE_PATH = CONFIG_DIR / CONFIG_FILE_NAME
 DEFAULT_SETTINGS = {
-    "app_id": None,
+    keys.APP_ID: None,
+    keys.CERT_PATH: None,
+    keys.CERT_PATH: None,
+    keys.ENROLLMENTS: [],
 }
 
 
