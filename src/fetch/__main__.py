@@ -1,18 +1,19 @@
 
-import json
-import csv
-import keyring
-import os
-import sys
 import logging
 
-from . import cli
-from .server import MicroServer
-from .api_client import Client, Account
+from .cmd import bf
 
 logger = logging.getLogger(__name__)
 
+def main():
 
+    bf.run()
+
+if __name__ == "__main__":
+    main()
+
+
+"""
 def dump_transactions_json(out_file_path, transactions):
     with open(
         f"{out_file_path}.json",
@@ -31,17 +32,11 @@ def dump_transactions_csv(out_file_path, transactions):
         writer.writerows(transactions)
 
 
-def main():
-
-    cli.run()
-
-    """
     args = parse_args()
     cert = (args.cert, args.cert_key)
     out_folder = args.output_folder
     if not (os.path.isdir(out_folder)):
         os.makedirs(out_folder, exist_ok=True)
-
 
 
     access_key = keyring.get_password("bank-fetch", "default")
@@ -83,6 +78,4 @@ def main():
             dump_transactions_csv(out_file_path, transactions)
     """
 
-if __name__ == "__main__":
-    main()
 
