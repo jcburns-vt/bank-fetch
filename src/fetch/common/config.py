@@ -1,8 +1,11 @@
 import logging
 import json
+import copy
 
 from platformdirs import user_config_dir
 from pathlib import Path
+
+from fetch.cmd.commands import config
 
 from . import keys
 
@@ -16,9 +19,12 @@ CONFIG_FILE_PATH = CONFIG_DIR / CONFIG_FILE_NAME
 DEFAULT_SETTINGS = {
     keys.APP_ID: None,
     keys.CERT_PATH: None,
-    keys.CERT_PATH: None,
+    keys.CERT_KEY_PATH: None,
     keys.ENROLLMENTS: [],
 }
+NON_EDITABLE = [
+    keys.ENROLLMENTS
+]
 
 
 class ConfigError(Exception):
@@ -43,7 +49,7 @@ def read(key):
     config_dict = _read_config()
 
     if key not in config_dict.keys():
-        raise ConfigError(f"setting with key \"{key}\" not found")
+        raise ConfigError(f"Setting with key \"{key}\" not found")
 
     return config_dict[key]
 
@@ -53,6 +59,14 @@ def write(key, value):
     config_dict = _read_config()
     config_dict[key] = value
     _write_config(config_dict)
+
+
+def get_editable():
+
+    config_dict = copy.deepcopy(_read_config())
+    for key in NON_EDITABLE:
+        config_dict.pop(key, None)
+    return config_dict
 
 
 def _read_config():
@@ -76,4 +90,7 @@ def _delete_config():
     """For testing."""
     if CONFIG_FILE_PATH.exists():
         CONFIG_FILE_PATH.unlink()
+
+
+default_setup()
 

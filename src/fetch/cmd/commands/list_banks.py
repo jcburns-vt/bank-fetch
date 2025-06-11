@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 def add_parser(subparsers, parents):
     list_cmd: ArgumentParser = subparsers.add_parser(
-        'list',
-        help="list existing bank connections",
+        "list",
+        help="List existing bank connections",
         parents=parents
     )
     list_cmd.set_defaults(func=run)

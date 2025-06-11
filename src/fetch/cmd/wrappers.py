@@ -3,13 +3,11 @@ import logging
 from pathlib import Path
 
 from ..common import config, keys
+from .errors import CommandError
 
 logger = logging.getLogger(__name__)
 
 
-class CommandError(Exception):
-    def __init__(self, msg):
-        super().__init__(msg)
 
 
 def requires_auth(func):

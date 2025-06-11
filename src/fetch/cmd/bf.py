@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from .wrappers import CommandError
+from .errors import CommandError
 
 from .commands import (
     add,
@@ -29,30 +29,31 @@ def run():
     # global arguments are tacked onto this parser
     global_parser = argparse.ArgumentParser(add_help=False)
     global_parser.add_argument(
-        '--app-id',
-        help='Teller app id',
+        "--app-id",
+        help="Teller app id",
     )
     global_parser.add_argument(
-        '--cert',
+        "--cert",
         type=str,
-        help='path to the TLS certificate'
+        help="Path to the TLS certificate"
     )
     global_parser.add_argument(
-        '--cert-key',
+        "--cert-key",
         type=str,
-        help='path to the TLS certificate private key'
+        help="Path to the TLS certificate private key"
     )
     global_parser.add_argument(
-        '-e',
-        '--env',
+        "-e",
+        "--env",
         choices=["sandbox", "development", "production"],
-        default="sandbox"
+        default="sandbox",
+        help="The evironment in which to interact with Teller",
     )
     global_parser.add_argument(
-        '-d',
-        '--debug',
-        action='store_true',
-        help='enable debug logging'
+        "-d",
+        "--debug",
+        action="store_true",
+        help="Enable debug logging"
     )
     subparsers = base_parser.add_subparsers(dest="command", required=True)
     for sub_cmd in [
