@@ -3,7 +3,7 @@ import logging
 
 from argparse import ArgumentParser
 
-from ..errors import CommandError
+from .errors import CommandError
 
 from ...common import config as c
 
@@ -44,7 +44,8 @@ def run(args):
     else:
         raise CommandError("Specified value without a corresponding key")
 
-
+# TODO: maybe bundle logic into a central app class rather than distributed
+# throughout the commands
 def list_settings():
     # TODO: make output prettier
     settings_dict = c.get_editable()
