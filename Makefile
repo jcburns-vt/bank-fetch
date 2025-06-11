@@ -1,4 +1,9 @@
 
+add:
+	bf add \
+		--cert /etc/teller/certificate.pem \
+		--cert-key /etc/teller/private_key.pem \
+		--app-id app_peevqq8j16t30s9eig000
 
 json:
 	bf app_peevqq8j16t30s9eig000 --cert /etc/teller/certificate.pem \

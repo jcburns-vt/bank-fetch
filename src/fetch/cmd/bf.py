@@ -1,6 +1,8 @@
 import argparse
 import logging
 
+from .wrappers import CommandError
+
 from .commands import (
     add,
     remove,
@@ -8,12 +10,15 @@ from .commands import (
     edit,
     fetch,
     config,
+    list_banks,
 )
+
 
 def run():
 
     base_parser = argparse.ArgumentParser(
         prog="bf",
+        usage="bf [command] [args] [options]",
         description="Uses Teller API to fetch bank transactions",
         epilog=(
             "Basic usage: specify the output folder and the path to each of"
@@ -21,9 +26,10 @@ def run():
         ),
     )
 
+    # global arguments are tacked onto this parser
     global_parser = argparse.ArgumentParser(add_help=False)
     global_parser.add_argument(
-        'app_id',
+        '--app-id',
         help='Teller app id',
     )
     global_parser.add_argument(
@@ -56,6 +62,7 @@ def run():
         edit,
         fetch,
         config,
+        list_banks,
     ]:
         sub_cmd.add_parser(subparsers, parents=[global_parser])
 
@@ -65,4 +72,10 @@ def run():
         level=logging.DEBUG if args.debug else logging.INFO,
     )
 
-    args.func(args)
+    try:
+        args.func(args)
+    except CommandError as err:
+        base_parser.error(f"Command Error:\n{err}")
+
+
+

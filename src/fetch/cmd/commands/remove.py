@@ -1,10 +1,12 @@
 
 import logging
 
+from argparse import ArgumentParser
+
 logger = logging.getLogger(__name__)
 
 def add_parser(subparsers, parents):
-    remove_cmd = subparsers.add_parser(
+    remove_cmd: ArgumentParser = subparsers.add_parser(
         'remove',
         help="remove an existing bank connection",
         parents=parents

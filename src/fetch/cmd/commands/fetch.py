@@ -1,11 +1,13 @@
 
 import logging
 
+from argparse import ArgumentParser
+
 logger = logging.getLogger(__name__)
 
 def add_parser(subparsers, parents):
 
-    fetch_cmd = subparsers.add_parser(
+    fetch_cmd: ArgumentParser = subparsers.add_parser(
         'fetch',
         help="fetch data from accounts",
         parents=parents,
