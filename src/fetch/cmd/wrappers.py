@@ -2,12 +2,10 @@ import logging
 
 from pathlib import Path
 
-from ..common import config, keys
+from ...common import config, keys
 from .errors import CommandError
 
 logger = logging.getLogger(__name__)
-
-
 
 
 def requires_auth(func):

@@ -2,7 +2,7 @@
 import logging
 
 from argparse import ArgumentParser
-from .wrappers import *
+from ..wrappers import *
 
 logger = logging.getLogger(__name__)
 

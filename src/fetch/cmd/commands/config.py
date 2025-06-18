@@ -3,9 +3,9 @@ import logging
 
 from argparse import ArgumentParser
 
-from .errors import CommandError
+from ..errors import CommandError
+from ...app import bf_app
 
-from ...common import config as c
 
 logger = logging.getLogger(__name__)
 
@@ -36,42 +36,11 @@ def run(args):
     logger.debug("config")
 
     if (not args.key) and (not args.value):
-        list_settings()
+        bf_app.list_settings()
     elif (key := args.key) and (not args.value):
-        lookup_setting(key)
+        bf_app.lookup_setting(key)
     elif (key := args.key) and (value := args.value):
-        edit_setting(key, value)
+        bf_app.edit_setting(key, value)
     else:
         raise CommandError("Specified value without a corresponding key")
-
-# TODO: maybe bundle logic into a central app class rather than distributed
-# throughout the commands
-def list_settings():
-    # TODO: make output prettier
-    settings_dict = c.get_editable()
-    print("\nSettings:")
-    print("---------")
-    for key in settings_dict.keys():
-        print(f"{key}: {settings_dict[key]}")
-    print()
-
-
-def lookup_setting(key):
-    # TODO: validate input
-    try:
-        value = c.read(key)
-        print(f"\n{key}: {value}\n")
-    except c.ConfigError as err:
-        raise CommandError(err)
-
-
-def edit_setting(key, value):
-    # TODO: validate input
-    try:
-        c.read(key)
-        c.write(key, value)
-    except c.ConfigError as err:
-        raise CommandError(err)
-
-
 
